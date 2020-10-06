@@ -3,3 +3,4 @@ torch
 torchaudio
 librosa==0.8
 pytest
+efficientnet_pytorch
