@@ -1,10 +1,15 @@
+import os.path
 from setuptools import setup
 
 # The directory containing this file
-HERE = pathlib.Path(__file__).parent
+HERE = os.path.abspath(os.path.dirname(__file__))
 
 # The text of the README file
-README = (HERE / "README.md").read_text()
+with open(os.path.join(HERE, "README.md")) as fid:
+    README = fid.read()
+
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
 
 # This call to setup() does all the work
 setup(
@@ -19,11 +24,11 @@ setup(
     license="MIT",
     classifiers=[
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.6.9",
     ],
-    packages=["reader"],
+    packages=["dialogue"],
     include_package_data=True,
-    install_requires=["torch", "torchaudio", "librosa"],
+    install_requires=requirements,
     entry_points={
         "console_scripts": [
             "dialogue=dialogue.__main__:main",
