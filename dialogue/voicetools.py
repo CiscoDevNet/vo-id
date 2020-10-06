@@ -59,4 +59,3 @@ def verify():
 
 if __name__ == "__main__":
     print(vectorize.__doc__)
-    vectorize(123)
