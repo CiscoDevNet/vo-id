@@ -130,3 +130,5 @@ dmypy.json
 
 #
 ._*
+vectorizer/data/*
+vectorizer/embedder.pt
