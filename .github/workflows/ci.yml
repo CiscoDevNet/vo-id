@@ -22,5 +22,5 @@ jobs:
           pip install -e .
       - name: Test with pytest
         run: | 
-          python vectorizer/test.py
+          python vectorizer/train.py
           pytest -vv -p no:warnings  
