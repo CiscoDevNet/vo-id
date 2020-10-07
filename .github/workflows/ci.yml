@@ -21,4 +21,6 @@ jobs:
           sudo apt-get install libsndfile1-dev
           pip install -e .
       - name: Test with pytest
-        run: pytest -vv -p no:warnings  
+        run: | 
+          python vectorizer/test.py
+          pytest -vv -p no:warnings  
