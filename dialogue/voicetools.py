@@ -23,6 +23,24 @@ class ToolBox(object):
         self.model = self.model.to(self.storage)
         self.model.eval()
 
+    def _check_audio(self, audio:Union[np.array, str]) -> Union[np.array, str]:
+        if isinstance(audio, str):
+            if not os.path.exists(audio):
+                raise FileNotFoundError(f"File not found at location: `{audio}`.")
+            try:
+                audio, _ = librosa.load(audio, sr=sr, mono=True)
+            except Exception as e:
+                raise ValueError(f"Could not read audio at location: `{audio}`.")
+                
+        elif not isinstance(audio, (np.ndarray, np.generic)):
+            raise TypeError(f"Invalid argument type: audio should be either str or np.array.")
+
+        audio = np.squeeze(audio)
+        if not len(audio.shape) == 1:
+            raise ValueError(f"Expected audio input to be 1 dimensional.")
+        return audio
+
+
     def vectorize(self, audio:Union[np.array, str], sr:int=16000, frame_stride:float=None, hop_size:float=None) -> np.array:
         """
         Parameters
@@ -46,20 +64,7 @@ class ToolBox(object):
             A 2 Dimensional vector representation of the audio input.    
 
         """
-        if isinstance(audio, str):
-            if not os.path.exists(audio):
-                raise FileNotFoundError(f"File not found at location: `{audio}`.")
-            try:
-                audio, _ = librosa.load(audio, sr=sr, mono=True)
-            except Exception as e:
-                raise ValueError(f"Could not read audio at location: `{audio}`.")
-                
-        elif not isinstance(audio, (np.ndarray, np.generic)):
-            raise TypeError(f"Invalid argument type: audio should be either str or np.array.")
-
-        audio = np.squeeze(audio)
-        if not len(audio.shape) == 1:
-            raise ValueError(f"Expected audio input to be 1 dimensional.")
+        audio = self._check_audio(audio)
 
         if frame_stride is not None:
             frame_stride = int(sr*frame_stride)
@@ -78,18 +83,44 @@ class ToolBox(object):
             features = self.model(audio)
 
         return features.cpu().numpy()
-        
-
-    def diarize(self):
-        pass
 
 
-    def recognize(self):
-        pass
+    def diarize(self, audio:Union[np.array, str], sr:int=16000, max_num_speakers:int=30) -> list:
+        """
+        Parameters
+        ----------
+        audio : np.array or str
+            1D numpy array or filepath to the audio file to vectorize.
+
+        sr : int, optional
+            Audio sample rate
+
+        frame_stride: float, optional
+            Chunk audio in frames of length frame_stride seconds
+
+        hop_size: float, optional
+            Chunk audio in frames of length frame_stride seconds with hop_size seconds
 
 
-    def verify(self):
-        pass
+        Returns
+        -------
+        np.array
+            A 2 Dimensional vector representation of the audio input.    
+
+        """
+        audio = self._check_audio(audio)
+        return list()
+
+    def recognize(self, audio:Union[np.array, str], enrollments:list, sr:int=16000, max_num_speakers:int=30) -> list:
+        audio = self._check_audio
+        enrollments = [self._check_audio(audio) for audio in enrollments]
+        return list()
+
+
+    def verify(self, audio:Union[np.array, str], enrollments:list, sr:int=16000 ) -> bool:
+        audio = self._check_audio
+        enrollments = [self._check_audio(audio) for audio in enrollments]
+        return False
 
 
 if __name__ == "__main__":

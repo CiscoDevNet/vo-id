@@ -11,23 +11,23 @@ from dialogue import voicetools
 toolbox = voicetools.ToolBox()
 num_embeddings = config.getint("VECTORIZER", "embeddings_size")
 
-def test_vectorize_filenotfound():
+def test_check_audio_filenotfound():
     with pytest.raises(FileNotFoundError):
-        toolbox.vectorize("*")
+        toolbox._check_audio("*")
 
-def test_vectorize_valueerror():
+def test_check_audio_valueerror():
     with pytest.raises(ValueError):
         open('tmp', 'a').close()
-        toolbox.vectorize('tmp')
+        toolbox._check_audio('tmp')
     os.remove('tmp')
 
-def test_vectorize_typeerror():
+def test_check_audio_typeerror():
     with pytest.raises(TypeError):
-        toolbox.vectorize(123)
+        toolbox._check_audio(123)
 
-def test_vectorize_shapeerror():
+def test_check_audio_shapeerror():
     with pytest.raises(ValueError):
-        toolbox.vectorize(np.random.randn(2,2))
+        toolbox._check_audio(np.random.randn(2,2))
 
 def test_vectorize_noframestride():
     audio = np.random.randn(16000)
