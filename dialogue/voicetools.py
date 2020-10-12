@@ -10,6 +10,7 @@ config.read("config.ini")
 
 from vectorizer.model import Model
 from vectorizer.utils import chunk_data
+from dialogue.utils import Segmenter
 
 class ToolBox(object):
     def __init__(self):
@@ -22,15 +23,16 @@ class ToolBox(object):
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.model = self.model.to(self.storage)
         self.model.eval()
+        self.segmenter = Segmenter()
 
-    def _check_audio(self, audio:Union[np.array, str]) -> Union[np.array, str]:
+    def _check_audio(self, audio:Union[np.array, str], sr:int) -> Union[np.array, str]:
         if isinstance(audio, str):
             if not os.path.exists(audio):
                 raise FileNotFoundError(f"File not found at location: `{audio}`.")
             try:
                 audio, _ = librosa.load(audio, sr=sr, mono=True)
             except Exception as e:
-                raise ValueError(f"Could not read audio at location: `{audio}`.")
+                raise ValueError(f"Exception: {e}\nCould not read audio at location: `{audio}`.")
                 
         elif not isinstance(audio, (np.ndarray, np.generic)):
             raise TypeError(f"Invalid argument type: audio should be either str or np.array.")
@@ -64,7 +66,7 @@ class ToolBox(object):
             A 2 Dimensional vector representation of the audio input.    
 
         """
-        audio = self._check_audio(audio)
+        audio = self._check_audio(audio, sr)
 
         if frame_stride is not None:
             frame_stride = int(sr*frame_stride)
@@ -95,31 +97,71 @@ class ToolBox(object):
         sr : int, optional
             Audio sample rate
 
-        frame_stride: float, optional
-            Chunk audio in frames of length frame_stride seconds
-
-        hop_size: float, optional
-            Chunk audio in frames of length frame_stride seconds with hop_size seconds
-
+        max_num_speakers: int, optional
+            Maximum amount of expected speakers in the audio
 
         Returns
         -------
-        np.array
-            A 2 Dimensional vector representation of the audio input.    
+        list
+            A list of strings. Each line is compatible with the RTTM format
 
         """
-        audio = self._check_audio(audio)
+        audio = self._check_audio(audio, sr)
+        segments = self.segmenter(audio)
+        audio_clips = [audio[s[0]:s[1]] for s in segments]
+        vectors = list(map(self.vectorize, audio_clips)) 
+        import pdb; pdb.set_trace()
         return list()
 
+
     def recognize(self, audio:Union[np.array, str], enrollments:list, sr:int=16000, max_num_speakers:int=30) -> list:
+        """
+        Parameters
+        ----------
+        audio : np.array or str
+            1D numpy array or filepath to the audio file to vectorize.
+
+        enrollments: list
+            list of tuples: (audio:Union[np.array, str], label:str)
+
+        sr : int, optional
+            Audio sample rate
+
+        max_num_speakers: int, optional
+            Maximum amount of expected speakers in the audio
+
+        Returns
+        -------
+        list
+            A list of strings. Each line is compatible with the RTTM format
+
+        """
         audio = self._check_audio
-        enrollments = [self._check_audio(audio) for audio in enrollments]
+        enrollments = [(self._check_audio(audio, sr), label) for audio, label in enrollments]
         return list()
 
 
     def verify(self, audio:Union[np.array, str], enrollments:list, sr:int=16000 ) -> bool:
+        """
+        Parameters
+        ----------
+        audio : np.array or str
+            1D numpy array or filepath to the audio file to vectorize.
+
+        enrollments: list
+            list of tuples: (audio:Union[np.array, str], label:str)
+
+        sr : int, optional
+            Audio sample rate
+
+        Returns
+        -------
+        bool
+            Whether or not the audio input is the same identity as the one provided in the enrollment list
+
+        """
         audio = self._check_audio
-        enrollments = [self._check_audio(audio) for audio in enrollments]
+        enrollments = [(self._check_audio(audio, sr), label) for audio, label in enrollments]
         return False
 
 
