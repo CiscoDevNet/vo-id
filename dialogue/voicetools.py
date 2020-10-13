@@ -11,6 +11,7 @@ config.read("config.ini")
 from vectorizer.model import Model
 from vectorizer.utils import chunk_data
 from dialogue.utils import Segmenter
+from spectralcluster import SpectralClusterer
 
 class ToolBox(object):
     def __init__(self):
@@ -24,6 +25,11 @@ class ToolBox(object):
         self.model = self.model.to(self.storage)
         self.model.eval()
         self.segmenter = Segmenter()
+        self.clusterer = SpectralClusterer(
+            min_clusters=2,
+            max_clusters=100,
+            p_percentile=0.95,
+            gaussian_blur_sigma=1)
 
     def _check_audio(self, audio:Union[np.array, str], sr:int) -> Union[np.array, str]:
         if isinstance(audio, str):
@@ -106,12 +112,18 @@ class ToolBox(object):
             A list of strings. Each line is compatible with the RTTM format
 
         """
+        rttm = list()
+
         audio = self._check_audio(audio, sr)
         segments = self.segmenter(audio)
         audio_clips = [audio[s[0]:s[1]] for s in segments]
         vectors = list(map(self.vectorize, audio_clips)) 
-        import pdb; pdb.set_trace()
-        return list()
+        self.clusterer.max_clusters = max_num_speakers
+        labels = self.clusterer.predict(np.squeeze(np.array(vectors)))
+        for idx, segment in enumerate(segments):
+            line = f"SPEAKER filename 1 {segment[0]/sr:.2f} {(segment[1]-segment[0])/sr:.2f} <NA> <NA> speaker{labels[idx]} <NA> <NA>\n"
+            rttm.append(line)
+        return rttm
 
 
     def recognize(self, audio:Union[np.array, str], enrollments:list, sr:int=16000, max_num_speakers:int=30) -> list:
@@ -141,7 +153,7 @@ class ToolBox(object):
         return list()
 
 
-    def verify(self, audio:Union[np.array, str], enrollments:list, sr:int=16000 ) -> bool:
+    def verify(self, audio:Union[np.array, str], enrollments:list, sr:int=16000 ) -> float:
         """
         Parameters
         ----------
@@ -156,13 +168,13 @@ class ToolBox(object):
 
         Returns
         -------
-        bool
-            Whether or not the audio input is the same identity as the one provided in the enrollment list
+        float
+            Confidence score
 
         """
         audio = self._check_audio
         enrollments = [(self._check_audio(audio, sr), label) for audio, label in enrollments]
-        return False
+        return 0.5
 
 
 if __name__ == "__main__":

@@ -8,3 +8,4 @@ online_triplet_loss
 tqdm
 tensorflow-gpu
 inaSpeechSegmenter
+spectralcluster
