@@ -3,6 +3,7 @@ import librosa
 import torch
 import numpy as np
 from typing import Union
+from collections import defaultdict
 
 import configparser
 config = configparser.ConfigParser(allow_no_value=True)
@@ -12,6 +13,8 @@ from vectorizer.model import Model
 from vectorizer.utils import chunk_data
 from dialogue.utils import Segmenter
 from spectralcluster import SpectralClusterer
+from scipy.optimize import linear_sum_assignment
+from scipy.spatial import distance
 
 class ToolBox(object):
     def __init__(self):
@@ -148,9 +151,54 @@ class ToolBox(object):
             A list of strings. Each line is compatible with the RTTM format
 
         """
-        audio = self._check_audio
+        rttm = list()
+
+        audio = self._check_audio(audio, sr)
         enrollments = [(self._check_audio(audio, sr), label) for audio, label in enrollments]
-        return list()
+        enrollment_vectors = [(self.vectorize(audio), label) for audio, label in enrollments]
+
+        # Compute representative vector for each label
+        enrollment_dict = defaultdict(list)
+        for vector, label in enrollment_vectors:
+            enrollment_dict[label].append(np.squeeze(vector))
+        enrollment_X, enrollment_y = zip(*[(np.mean(vectors, axis=0), label) for label, vectors in enrollment_dict.items()])
+
+        segments = self.segmenter(audio)
+        audio_clips = [audio[s[0]:s[1]] for s in segments]
+        vectors = list(map(self.vectorize, audio_clips)) 
+        self.clusterer.max_clusters = max_num_speakers
+        labels = self.clusterer.predict(np.squeeze(np.array(vectors)))
+
+        # Compute representative vector for each label
+        segments_dict = defaultdict(list)
+        for idx, vector in enumerate(vectors):
+            segments_dict[labels[idx]].append(np.squeeze(vector))
+        segment_X, segment_y = zip(*[(np.mean(vectors, axis=0), label) for label, vectors in segments_dict.items()])
+
+        # Make sure we have the right shape
+        enrollment_X = np.squeeze(enrollment_X)
+        segment_X = np.squeeze(segment_X)
+        if len(enrollment_X.shape) == 1:
+            enrollment_X = enrollment_X[None, :]
+        if len(segment_X.shape) == 1:
+            segment_X = segment_X[None, :]
+
+        cost = distance.cdist(np.array(enrollment_X), np.array(segment_X), metric='euclidean')
+        row_ind, col_ind = linear_sum_assignment(cost)
+        num_solutions = len(row_ind)
+        id2label = dict()
+        # Map between speaker ID and provided label (if it exists)
+        for sol in range(num_solutions):
+            id2label[list(segment_y)[col_ind[sol]]] = list(enrollment_y)[row_ind[sol]]
+
+        for idx, segment in enumerate(segments):
+            label = id2label.get(labels[idx])
+            if label is None:
+                label = f"speaker{labels[idx]}"
+            line = f"SPEAKER filename 1 {segment[0]/sr:.2f} {(segment[1]-segment[0])/sr:.2f} <NA> <NA> {label} <NA> <NA>\n"
+            rttm.append(line)
+        print(rttm)
+        return rttm
 
 
     def verify(self, audio:Union[np.array, str], enrollments:list, sr:int=16000 ) -> float:
@@ -172,11 +220,18 @@ class ToolBox(object):
             Confidence score
 
         """
-        audio = self._check_audio
+        audio = self._check_audio(audio, sr)
         enrollments = [(self._check_audio(audio, sr), label) for audio, label in enrollments]
         return 0.5
 
 
 if __name__ == "__main__":
     toolbox = ToolBox()
+
+    audiopath = "../../short_podcast.wav"
+    enroll1_path = "../../enroll_chomsky.wav"
+    enroll2_path = "../../enroll_fridman.wav"
+    enroll3_path = "../../enroll_ktick1.wav"
+    toolbox.recognize(audiopath, enrollments=[(enroll1_path, "Chomsky"), (enroll2_path, "Fridman"), (enroll3_path, "ktick")])
+ 
     print(toolbox.vectorize.__doc__)
