@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torchaudio
+import torch.nn.functional as F
 from efficientnet_pytorch import EfficientNet
 
 import configparser
@@ -85,11 +86,13 @@ class Model(nn.Module):
         features = self.net(x).view(batch_size, -1)        
         features = self.gelu(features)
         features = self.emb_fc(features)
+        features = F.normalize(features, p=2, dim=1)
         
         return features
 
 if __name__ == "__main__":
     model = Model()
+    print(f'Number of model parameters: {sum([p.data.nelement() for name, p in model.named_parameters() ]):,}')
     audio = torch.randn(config.getint("VECTORIZER", "batch_size"), 32000)
     features = model(audio, train=True)
     print(features.shape)

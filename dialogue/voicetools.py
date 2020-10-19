@@ -32,7 +32,7 @@ class ToolBox(object):
             min_clusters=2,
             max_clusters=100,
             p_percentile=0.95,
-            gaussian_blur_sigma=1)
+            gaussian_blur_sigma=1.)
 
     def _check_audio(self, audio:Union[np.array, str], sr:int) -> Union[np.array, str]:
         if isinstance(audio, str):
@@ -197,7 +197,7 @@ class ToolBox(object):
                 label = f"speaker{labels[idx]}"
             line = f"SPEAKER filename 1 {segment[0]/sr:.2f} {(segment[1]-segment[0])/sr:.2f} <NA> <NA> {label} <NA> <NA>\n"
             rttm.append(line)
-        print(rttm)
+
         return rttm
 
 
@@ -232,6 +232,5 @@ if __name__ == "__main__":
     enroll1_path = "../../enroll_chomsky.wav"
     enroll2_path = "../../enroll_fridman.wav"
     enroll3_path = "../../enroll_ktick1.wav"
-    toolbox.recognize(audiopath, enrollments=[(enroll1_path, "Chomsky"), (enroll2_path, "Fridman"), (enroll3_path, "ktick")])
- 
+    print(toolbox.recognize(audiopath, enrollments=[(enroll1_path, "Chomsky"), (enroll2_path, "Fridman"), (enroll3_path, "ktick")])) 
     print(toolbox.vectorize.__doc__)
