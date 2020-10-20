@@ -32,7 +32,7 @@ class ToolBox(object):
             min_clusters=2,
             max_clusters=100,
             p_percentile=0.95,
-            gaussian_blur_sigma=1.)
+            gaussian_blur_sigma=0.8)
 
     def _check_audio(self, audio:Union[np.array, str], sr:int) -> Union[np.array, str]:
         if isinstance(audio, str):
@@ -229,8 +229,18 @@ if __name__ == "__main__":
     toolbox = ToolBox()
 
     audiopath = "../../short_podcast.wav"
-    enroll1_path = "../../enroll_chomsky.wav"
-    enroll2_path = "../../enroll_fridman.wav"
-    enroll3_path = "../../enroll_ktick1.wav"
-    print(toolbox.recognize(audiopath, enrollments=[(enroll1_path, "Chomsky"), (enroll2_path, "Fridman"), (enroll3_path, "ktick")])) 
+    enroll_f1_path = "../../enroll_fridman_1.wav"
+    enroll_f2_path = "../../enroll_fridman_2.wav"
+    enroll_c1_path = "../../enroll_chomsky_1.wav"
+    enroll_c2_path = "../../enroll_chomsky_2.wav"
+    enroll_d1_path = "../../enroll_dario_1.wav"
+    enroll_d2_path = "../../enroll_dario_2.wav"
+    print(toolbox.recognize(audiopath, enrollments=[
+        (enroll_c1_path, "Chomsky"), 
+        (enroll_f1_path, "Fridman"), 
+        (enroll_d1_path, "Dario"), 
+        (enroll_c2_path, "Chomsky"), 
+        (enroll_f2_path, "Fridman"), 
+        (enroll_d2_path, "Dario")
+    ])) 
     print(toolbox.vectorize.__doc__)
