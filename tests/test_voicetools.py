@@ -10,24 +10,25 @@ from dialogue import voicetools
 
 toolbox = voicetools.ToolBox()
 num_embeddings = config.getint("VECTORIZER", "embeddings_size")
+sr = 16000
 
 def test_check_audio_filenotfound():
     with pytest.raises(FileNotFoundError):
-        toolbox._check_audio("*")
+        toolbox._check_audio("*", sr)
 
 def test_check_audio_valueerror():
     with pytest.raises(ValueError):
         open('tmp', 'a').close()
-        toolbox._check_audio('tmp')
+        toolbox._check_audio('tmp', sr)
     os.remove('tmp')
 
 def test_check_audio_typeerror():
     with pytest.raises(TypeError):
-        toolbox._check_audio(123)
+        toolbox._check_audio(123, sr)
 
 def test_check_audio_shapeerror():
     with pytest.raises(ValueError):
-        toolbox._check_audio(np.random.randn(2,2))
+        toolbox._check_audio(np.random.randn(2,2), sr)
 
 def test_vectorize_noframestride():
     audio = np.random.randn(16000)
