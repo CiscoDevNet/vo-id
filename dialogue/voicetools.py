@@ -217,30 +217,23 @@ class ToolBox(object):
         Returns
         -------
         float
-            Confidence score
+            Similarity score --> [0, 1]
 
         """
         audio = self._check_audio(audio, sr)
         enrollments = [(self._check_audio(audio, sr), label) for audio, label in enrollments]
-        return 0.5
+        enrollment_vectors = [np.squeeze(self.vectorize(audio)) for audio, _ in enrollments]
+        segments = self.segmenter(audio)
+        audio_clips = [audio[s[0]:s[1]] for s in segments]
+        vectors = list(map(self.vectorize, audio_clips)) 
+        audio_vector = np.mean(vectors, axis=0)
+        similarity = max(0, np.mean(1-distance.cdist(audio_vector, np.array(enrollment_vectors), 'cosine')))
+        return similarity
 
 
 if __name__ == "__main__":
     toolbox = ToolBox()
-
-    audiopath = "../../short_podcast.wav"
-    enroll_f1_path = "../../enroll_fridman_1.wav"
-    enroll_f2_path = "../../enroll_fridman_2.wav"
-    enroll_c1_path = "../../enroll_chomsky_1.wav"
-    enroll_c2_path = "../../enroll_chomsky_2.wav"
-    enroll_d1_path = "../../enroll_dario_1.wav"
-    enroll_d2_path = "../../enroll_dario_2.wav"
-    print(toolbox.recognize(audiopath, enrollments=[
-        (enroll_c1_path, "Chomsky"), 
-        (enroll_f1_path, "Fridman"), 
-        (enroll_d1_path, "Dario"), 
-        (enroll_c2_path, "Chomsky"), 
-        (enroll_f2_path, "Fridman"), 
-        (enroll_d2_path, "Dario")
-    ])) 
     print(toolbox.vectorize.__doc__)
+    print(toolbox.diarize.__doc__)
+    print(toolbox.recognize.__doc__)
+    print(toolbox.verify.__doc__)

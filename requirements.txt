@@ -9,3 +9,4 @@ tqdm
 tensorflow-gpu
 inaSpeechSegmenter
 spectralcluster
+simpleder
