@@ -18,8 +18,7 @@ jobs:
           python-version: 3.8.6
       - name: Install dependencies
         run: |
-          sudo apt-get install libsndfile1-dev
-	  sudo apt-get install ffmpeg
+          sudo apt-get install libsndfile1-dev ffmpeg
           pip install -e .
       - name: Test with pytest
         run: | 
