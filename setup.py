@@ -24,7 +24,7 @@ setup(
     license="MIT",
     classifiers=[
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.8.5",
+        "Programming Language :: Python :: 3.8.6",
     ],
     packages=["dialogue"],
     include_package_data=True,
