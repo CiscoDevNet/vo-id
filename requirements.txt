@@ -3,10 +3,10 @@ torch
 torchaudio
 librosa==0.8
 pytest
-efficientnet_pytorch
-online_triplet_loss
+# efficientnet_pytorch
+# online_triplet_loss
 tqdm
-tensorflow-gpu
-inaSpeechSegmenter
+# tensorflow-gpu
+# inaSpeechSegmenter
 spectralcluster
 simpleder

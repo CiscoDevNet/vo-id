@@ -8,8 +8,8 @@ import configparser
 config = configparser.ConfigParser(allow_no_value=True)
 config.read("config.ini")
 
-from dialogue import voicetools
-from dialogue.utils import rttm2simple
+from void import voicetools
+from void.utils import rttm2simple
 
 toolbox = voicetools.ToolBox()
 num_embeddings = config.getint("VECTORIZER", "embeddings_size")

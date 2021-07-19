@@ -11,7 +11,7 @@ config.read("config.ini")
 
 from vectorizer.model import Model
 from vectorizer.utils import chunk_data
-from dialogue.utils import Segmenter
+from void.utils import Segmenter
 from spectralcluster import SpectralClusterer
 from scipy.optimize import linear_sum_assignment
 from scipy.spatial import distance

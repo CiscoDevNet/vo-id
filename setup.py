@@ -13,12 +13,12 @@ with open('requirements.txt') as f:
 
 # This call to setup() does all the work
 setup(
-    name="dialogue",
+    name="void",
     version="0.1",
     description="Machine Learning Tools for Audio Processing",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/dariocazzani/dialogue",
+    url="https://github.com/CiscoDevNet/vo-id",
     author="Real Python",
     author_email="dariocazzani@gmail.com",
     license="MIT",
@@ -26,12 +26,12 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.8.6",
     ],
-    packages=["dialogue"],
+    packages=["void"],
     include_package_data=True,
     install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "dialogue=dialogue.__main__:main",
+            "void=void.__main__:main",
         ]
     },
 )

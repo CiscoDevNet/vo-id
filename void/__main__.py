@@ -1,23 +1,23 @@
 """Machine Learning tools for audio processing
 Usage:
 ------
-    $ dialogue <audio-path>
+    $ void <audio-path>
     -h, --help         Show this help
 
 Contact:
 --------
 - dariocazzani@gmail.com
-- https://github.com/dariocazzani/
+- https://github.com/CiscoDevNet/vo-id
 
 Version:
 --------
-- dialogue v0.1
+- vo-id v0.1
 """
 
 import argparse
 parser = argparse.ArgumentParser(description='', add_help=False)
 parser.add_argument('-v', '--version', action='version',
-                    version='dialogue version=0.1')
+                    version='vo-id version=0.1')
 parser.add_argument('-h', '--help', action='store_true')
 
 args = parser.parse_args()
