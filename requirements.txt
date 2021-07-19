@@ -4,9 +4,8 @@ torchaudio
 torchvision
 librosa==0.8
 pytest
-# online_triplet_loss
+online_triplet_loss
 tqdm
-# tensorflow-gpu
-# inaSpeechSegmenter
+pyvad
 spectralcluster
 simpleder
