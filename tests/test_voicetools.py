@@ -63,7 +63,7 @@ def test_vectorize_framestride():
     features = toolbox.vectorize(audio, sr=16000, frame_stride=0.5)
     assert features.shape == (2, num_embeddings)
 
-def test_vectorize_framestride():
+def test_vectorize_framestride2():
     audio = np.random.randn(16000)
     features = toolbox.vectorize(audio, sr=16000, frame_stride=0.5, hop_size=0.25)
     assert features.shape == (3, num_embeddings)
@@ -101,3 +101,16 @@ def test_verify():
                                     (enroll_f2_path, "Fridman"),
                                 ])
     assert (similarity >= 0 and similarity <= 1)
+
+if __name__ == '__main__':
+    test_check_audio_filenotfound()
+    test_check_audio_valueerror()
+    test_check_audio_typeerror()
+    test_check_audio_shapeerror()
+    test_vectorize_noframestride()
+    test_vectorize_framestride()
+    test_vectorize_framestride2()
+    test_diarize()
+    test_recognize()
+    test_verify()
+

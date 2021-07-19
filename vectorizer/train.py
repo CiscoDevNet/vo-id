@@ -145,7 +145,7 @@ def validate(model, test_loaders, device) -> float:
     print(f"Computing enrollment and test vectors")
     pbar = tqdm(total=val_batches_num)
     for test_loader in test_loaders:
-        for waveform, sample_rate, _, speaker_id, _, _ in test_loader:
+        for waveform, _, _, speaker_id, _, _ in test_loader:
             speaker_id = speaker_id.item()
             audio = np.squeeze(waveform.cpu().numpy())[None, :]
             audio = torch.from_numpy(audio.astype(np.float32)).to(device)
