@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import torchaudio
+import torchvision
 import torch.nn.functional as F
-from efficientnet_pytorch import EfficientNet
 
 import configparser
 config = configparser.ConfigParser(allow_no_value=True)
@@ -71,10 +71,12 @@ class Model(nn.Module):
 
         self.train_preprocess_steps = nn.Sequential(*tuple(preprocess_steps))
 
-        self.net = EfficientNet.from_name("efficientnet-b0", include_top=False)
-        self.net._change_in_channels(in_channels=1)
+        model = torchvision.models.mobilenet_v3_small(pretrained=False)
+        self.net = torch.nn.Sequential(*list(model.children())[:-1])
+        # Use single channel input
+        self.net[0][0] = nn.Conv2d(1, 16, kernel_size=(3,3), stride=(2,2), padding=(1,1), bias=False)
         self.gelu = torch.nn.GELU()
-        self.emb_fc = nn.Linear(1280, config.getint("VECTORIZER", "embeddings_size"))
+        self.emb_fc = nn.Linear(576, config.getint("VECTORIZER", "embeddings_size"))
 
     def forward(self, x:torch.Tensor, train:bool=False) -> torch.Tensor:
         batch_size = x.shape[0]
@@ -93,7 +95,7 @@ class Model(nn.Module):
 if __name__ == "__main__":
     model = Model()
     print(f'Number of model parameters: {sum([p.data.nelement() for name, p in model.named_parameters() ]):,}')
-    audio = torch.randn(config.getint("VECTORIZER", "batch_size"), 32000)
+    audio = torch.randn(config.getint("VECTORIZER", "batch_size"), 16000)
     features = model(audio, train=True)
     print(features.shape)
 

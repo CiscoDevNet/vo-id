@@ -1,9 +1,9 @@
 numba==0.48
 torch
 torchaudio
+torchvision
 librosa==0.8
 pytest
-# efficientnet_pytorch
 # online_triplet_loss
 tqdm
 # tensorflow-gpu
