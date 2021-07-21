@@ -1,12 +1,15 @@
 import numpy as np
 import random
 import torch
+import joblib
 from numpy.lib.stride_tricks import as_strided as ast
 
 import configparser
 config = configparser.ConfigParser(allow_no_value=True)
 config.read("config.ini")
 
+print("Loading speaker_id dict...")
+speaker_id_dict = joblib.load("vectorizer/speaker_ids_map.bin")
 def preprocess(x):
     audios = list()
     labels = list()
@@ -14,7 +17,10 @@ def preprocess(x):
     max_length = int(config.getint("AUDIO", "sr") * config.getfloat("VECTORIZER", "max_length"))
     length = np.random.randint(min_length, max_length)
 
-    for waveform, sample_rate, _, speaker_id, _, _ in x:
+    for waveform, _, _, speaker_id, _, _ in x:
+        label = speaker_id_dict.get(int(speaker_id))
+        if label is None:
+            raise ValueError("If you changed the trainset, you'll have to update the speaker_id map stored at `vectorizer/speaker_ids_map.bin`")
         start = random.randint(0, max(0, waveform.shape[1] - length))
         audio = waveform[:, start:start + length]
         if audio.shape[1] < length:
