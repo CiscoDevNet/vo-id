@@ -27,7 +27,7 @@ def main():
     testsets = json.loads(config.get("DATA", "testsets"))
     test_datasets = [torchaudio.datasets.LIBRISPEECH(config.get("VECTORIZER", "datapath"), url=testset, download=True) for testset in testsets]
 
-    kwargs = {'num_workers': int(mp.cpu_count()), 'pin_memory': True} if torch.cuda.is_available() else {}
+    kwargs = {'num_workers': int(mp.cpu_count()), 'pin_memory': False} if torch.cuda.is_available() else {}
 
     train_loaders = [DataLoader(dataset=train_dataset,
                                     batch_size=config.getint("VECTORIZER", "batch_size"),
