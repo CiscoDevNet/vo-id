@@ -4,6 +4,7 @@ torchaudio
 torchvision
 librosa==0.8
 pytest
+joblib
 online_triplet_loss
 tqdm
 pyvad
