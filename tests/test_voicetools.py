@@ -3,6 +3,8 @@ import os
 import numpy as np
 import simpleder
 
+import warnings
+warnings.filterwarnings('ignore')
 
 import configparser
 config = configparser.ConfigParser(allow_no_value=True)
