@@ -44,7 +44,7 @@ def main():
 
     torch.manual_seed(config.get("SEED", "value"))
     device = torch.device("cuda:0")
-    print(f'Number of model parameters: {sum([p.data.nelement() for name, p in model.named_parameters() ]):,}')
+    print(f'Number of model parameters: {sum([p.data.nelement() for _, p in model.named_parameters() ]):,}')
 
     optimizer = optim.SGD([{'params': model.parameters()}],
                                 lr=config.getfloat("VECTORIZER", "lr"),
