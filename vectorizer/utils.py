@@ -26,7 +26,7 @@ def preprocess(x):
         if audio.shape[1] < length:
             audio = torch.nn.functional.pad(audio, (0, length - audio.shape[1]), "constant", 0)
         audios.append(torch.squeeze(audio))
-        labels.append(torch.tensor(speaker_id))
+        labels.append(torch.tensor(label))
 
     return torch.stack(audios), torch.stack(labels)
 
@@ -74,3 +74,15 @@ def chunk_data(data, window_size, overlap_size=0, flatten_inside_window=True):
         return ret
     else:
         return ret.reshape((num_windows,-1,data.shape[1]))
+
+class Full_layer(torch.nn.Module):
+    '''explicitly define the fully connected layer'''
+
+    def __init__(self, feature_num, class_num):
+        super(Full_layer, self).__init__()
+        self.class_num = class_num
+        self.fc = torch.nn.Linear(feature_num, class_num)
+
+    def forward(self, x):
+        x = self.fc(x)
+        return x
