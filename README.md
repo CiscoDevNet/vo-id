@@ -5,7 +5,7 @@ If it's the first time you run it, this might take a while to download all the t
 Just hang on :) 
 ```bash
 mkdir vectorizer/data
-python vectorizer.train.py
+python vectorizer/train.py
 ```
 
 ### Notes
