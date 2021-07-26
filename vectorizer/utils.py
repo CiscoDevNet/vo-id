@@ -9,7 +9,7 @@ config = configparser.ConfigParser(allow_no_value=True)
 config.read("config.ini")
 
 print("Loading speaker_id dict...")
-speaker_id_dict = joblib.load("vectorizer/speaker_ids_map.bin")
+speaker_id_dict = joblib.load(config.get("VECTORIZER", "train_labels_dict"))
 def preprocess(x):
     audios = list()
     labels = list()
@@ -20,7 +20,7 @@ def preprocess(x):
     for waveform, _, _, speaker_id, _, _ in x:
         label = speaker_id_dict.get(int(speaker_id))
         if label is None:
-            raise ValueError("If you changed the trainset, you'll have to update the speaker_id map stored at `vectorizer/speaker_ids_map.bin`")
+            raise ValueError("If you changed the trainset, you'll have to update the speaker_id map stored at `config.get('VECTORIZER', 'train_labels_dict')`")
         start = random.randint(0, max(0, waveform.shape[1] - length))
         audio = waveform[:, start:start + length]
         if audio.shape[1] < length:
