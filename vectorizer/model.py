@@ -50,6 +50,31 @@ class Normalize3D(nn.Module):
         return X.view(batch_size, num_features, num_steps)
 
 
+class TrainableSpectrogram(nn.Module):
+    """
+    From 1D raw audio to 2D representation
+    """
+    def __init__(self, config):
+        super(TrainableSpectrogram, self).__init__()
+        self.config = config
+        self.conv1 = nn.Conv1d(in_channels=1, out_channels=16, kernel_size=320, stride=160, padding=80, bias=False)
+        self.conv2 = nn.Conv1d(in_channels=16, out_channels=8, kernel_size=1, stride=1, padding=0, bias=False)
+        self.conv3 = nn.Conv1d(in_channels=8, out_channels=self.config.getint('AUDIO', 'n_mels'), kernel_size=1, stride=1, padding=0, bias=False)
+        self.relu = nn.ReLU(inplace=False)
+
+    def forward(self, x:torch.Tensor):
+        if len(x.shape) != 2:
+            raise ValueError("Audio should be 2D: [batch_size X audio_length]")
+        if x.shape[1] < 1:
+            raise ValueError("Audio length is zero")
+        
+        x.unsqueeze_(1) # Add channel dimension
+        x = self.relu(self.conv1(x))
+        x = self.relu(self.conv2(x))
+        x = self.relu(self.conv3(x))
+        return x
+
+
 class Model(nn.Module):
     """
     Feature extractor model
@@ -61,7 +86,10 @@ class Model(nn.Module):
 
         preprocess_steps = list()
         preprocess_steps.append(Normalize())
-        preprocess_steps.append(torchaudio.transforms.MelSpectrogram(sample_rate=self.sr, n_fft=400, win_length=400, hop_length=160, n_mels=self.n_mels))
+        if config.getboolean("VECTORIZER", "use_trainable_mel"):
+            preprocess_steps.append(TrainableSpectrogram(config))
+        else:
+            preprocess_steps.append(torchaudio.transforms.MelSpectrogram(sample_rate=self.sr, n_fft=400, win_length=400, hop_length=160, n_mels=self.n_mels))
         preprocess_steps.append(Normalize3D())
         
         self.eval_preprocess_steps = nn.Sequential(*tuple(preprocess_steps))
@@ -94,7 +122,9 @@ class Model(nn.Module):
 
 if __name__ == "__main__":
     model = Model()
+    trainable_spec = TrainableSpectrogram(config)
     print(f'Number of model parameters: {sum([p.data.nelement() for name, p in model.named_parameters() ]):,}')
+    print(f'Number of TrainableSpectrogram parameters: {sum([p.data.nelement() for _, p in trainable_spec.named_parameters() ]):,}')
     audio = torch.randn(config.getint("VECTORIZER", "batch_size"), 16000)
     features = model(audio, train=True)
     print(features.shape)
@@ -106,4 +136,3 @@ if __name__ == "__main__":
     normalize = Normalize()
     audio = torch.arange(-2, 3).view(1, 5)
     print(normalize(audio))
-    
