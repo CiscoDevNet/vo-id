@@ -16,6 +16,7 @@ from void.utils import rttm2simple
 toolbox = voicetools.ToolBox()
 num_embeddings = config.getint("VECTORIZER", "embeddings_size")
 sr = 16000
+frame_stride = config.getfloat("AUDIO", "frame_stride")
 
 audiopath = "tests/audio_samples/short_podcast.wav"
 enroll_f1_path = "tests/audio_samples/enroll_fridman_1.wav"
@@ -56,18 +57,18 @@ def test_check_audio_shapeerror():
         toolbox._check_audio(np.random.randn(2,2), sr)
 
 def test_vectorize_noframestride():
-    audio = np.random.randn(16000)
+    audio = np.random.randn(int(sr*frame_stride))
     features = toolbox.vectorize(audio)
     assert features.shape == (1, num_embeddings)
 
 def test_vectorize_framestride():
-    audio = np.random.randn(16000)
-    features = toolbox.vectorize(audio, sr=16000, frame_stride=0.5)
+    audio = np.random.randn(sr)
+    features = toolbox.vectorize(audio, sr=sr, frame_stride=0.5, hop_size=0.5)
     assert features.shape == (2, num_embeddings)
 
 def test_vectorize_framestride2():
     audio = np.random.randn(16000)
-    features = toolbox.vectorize(audio, sr=16000, frame_stride=0.5, hop_size=0.25)
+    features = toolbox.vectorize(audio, sr=sr, frame_stride=0.5, hop_size=0.25)
     assert features.shape == (3, num_embeddings)
 
 def test_diarize():
@@ -102,6 +103,7 @@ def test_verify():
                                     (enroll_f1_path, "Fridman"),
                                     (enroll_f2_path, "Fridman"),
                                 ])
+    print(f"Same person probability: {similarity*100:.2f}%")
     assert (similarity >= 0 and similarity <= 1)
 
 if __name__ == '__main__':

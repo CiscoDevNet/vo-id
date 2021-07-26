@@ -32,7 +32,7 @@ class ToolBox(object):
             min_clusters=2,
             max_clusters=100,
             p_percentile=0.95,
-            gaussian_blur_sigma=0.8)
+            gaussian_blur_sigma=1.0)
 
     def _check_audio(self, audio:Union[np.array, str], sr:int) -> Union[np.array, str]:
         if isinstance(audio, str):
@@ -77,18 +77,11 @@ class ToolBox(object):
         """
         audio = self._check_audio(audio, sr)
 
-        if frame_stride is not None:
-            frame_stride = int(sr*frame_stride)
-            if hop_size is not None:
-                hop_size = int(sr*hop_size)
-            else:
-                hop_size = frame_stride
-            audio = chunk_data(audio, frame_stride, max(0, (frame_stride-hop_size)))
-            print(audio.shape)
-
-        else:
-            audio = audio[None, :]
-        
+        frame_stride = config.getfloat("AUDIO", "frame_stride") if frame_stride is None else frame_stride
+        hop_size = config.getfloat("AUDIO", "hop_size") if hop_size is None else hop_size
+        frame_stride = int(sr*frame_stride)
+        hop_size = int(sr*hop_size)
+        audio = chunk_data(audio, frame_stride, max(0, (frame_stride-hop_size)))
         audio = torch.from_numpy(np.array(audio).astype(np.float32)).to(self.storage)
         with torch.no_grad():
             features = self.model(audio)
@@ -121,6 +114,7 @@ class ToolBox(object):
         segments = self.segmenter(audio)
         audio_clips = [audio[s[0]:s[1]] for s in segments]
         vectors = list(map(self.vectorize, audio_clips)) 
+        vectors = [item for sublist in vectors for item in sublist]
         self.clusterer.max_clusters = max_num_speakers
         labels = self.clusterer.predict(np.squeeze(np.array(vectors)))
         for idx, segment in enumerate(segments):
@@ -155,7 +149,11 @@ class ToolBox(object):
 
         audio = self._check_audio(audio, sr)
         enrollments = [(self._check_audio(audio, sr), label) for audio, label in enrollments]
-        enrollment_vectors = [(self.vectorize(audio), label) for audio, label in enrollments]
+        enrollments = [(self.vectorize(audio), label) for audio, label in enrollments]
+        enrollment_vectors = list()
+        for vectors, l in enrollments:
+            for v in list(vectors):
+                enrollment_vectors.append((v, l))
 
         # Compute representative vector for each label
         enrollment_dict = defaultdict(list)
@@ -166,6 +164,7 @@ class ToolBox(object):
         segments = self.segmenter(audio)
         audio_clips = [audio[s[0]:s[1]] for s in segments]
         vectors = list(map(self.vectorize, audio_clips)) 
+        vectors = [item for sublist in vectors for item in sublist]
         self.clusterer.max_clusters = max_num_speakers
         labels = self.clusterer.predict(np.squeeze(np.array(vectors)))
 
@@ -222,12 +221,13 @@ class ToolBox(object):
         """
         audio = self._check_audio(audio, sr)
         enrollments = [(self._check_audio(audio, sr), label) for audio, label in enrollments]
-        enrollment_vectors = [np.squeeze(self.vectorize(audio)) for audio, _ in enrollments]
+        enrollment_vector = [np.mean(self.vectorize(audio),axis=0) for audio, _ in enrollments]
         segments = self.segmenter(audio)
         audio_clips = [audio[s[0]:s[1]] for s in segments]
         vectors = list(map(self.vectorize, audio_clips)) 
+        vectors = [item for sublist in vectors for item in sublist]
         audio_vector = np.mean(vectors, axis=0)
-        similarity = max(0, np.mean(1-distance.cdist(audio_vector, np.array(enrollment_vectors), 'cosine')))
+        similarity = max(0, np.mean(1-distance.cdist(audio_vector[None, :], np.array(enrollment_vector), 'cosine')))
         return similarity
 
 

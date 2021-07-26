@@ -68,6 +68,7 @@ def main():
     model.to(device)
     fc.to(device)
     best_acc = 0
+    best_val_prec_path = config.get("VECTORIZER", "trained_model")
 
     try:
         for epoch in range(start_epoch, config.getint("VECTORIZER", "epochs")):
@@ -89,7 +90,6 @@ def main():
             
             # Save model with highest validation accuracy
             if is_best:
-                best_val_prec_path = config.get("VECTORIZER", "trained_model")
                 print(f"Saving new best validation accuracy model to {best_val_prec_path}")
 
                 model_state_dict = model.state_dict() 
