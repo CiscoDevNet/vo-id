@@ -8,9 +8,11 @@ import time, random, os, json, joblib
 import multiprocessing as mp
 from collections import defaultdict
 from tqdm import tqdm
+from glob import glob
 import numpy as np
 
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
 
 import configparser
 config = configparser.ConfigParser(allow_no_value=True)
@@ -21,11 +23,12 @@ from vectorizer.utils import preprocess, AverageMeter, Full_layer
 
 def main():
     model = Model()
-    
+    datapath =  config.get("VECTORIZER", "datapath")
     trainsets = json.loads(config.get("DATA", "trainsets"))
-    train_datasets = [torchaudio.datasets.LIBRISPEECH(config.get("VECTORIZER", "datapath"), url=trainset, download=True) for trainset in trainsets]
     testsets = json.loads(config.get("DATA", "testsets"))
+    train_datasets = [torchaudio.datasets.LIBRISPEECH(datapath, url=trainset, download=True) for trainset in trainsets]
     test_datasets = [torchaudio.datasets.LIBRISPEECH(config.get("VECTORIZER", "datapath"), url=testset, download=True) for testset in testsets]
+    num_test_speakers = sum([len(glob(os.path.join(datapath, "LibriSpeech", t, "*"))) for t in testsets])
 
     train_dataset = torch.utils.data.ConcatDataset(train_datasets)
     test_dataset = torch.utils.data.ConcatDataset(test_datasets)
@@ -48,10 +51,11 @@ def main():
     device = torch.device("cuda:0")
     print(f'Number of model parameters: {sum([p.data.nelement() for _, p in model.named_parameters() ]):,}')
 
-    speaker_id_dict = joblib.load("vectorizer/speaker_ids_map.bin")
+    speaker_id_dict = joblib.load(config.get("VECTORIZER", "train_labels_dict"))
     num_train_classes = len(speaker_id_dict)
     print(f"Number of speakers in training set: {num_train_classes}")
     fc = Full_layer(config.getint("VECTORIZER", "embeddings_size"), num_train_classes)
+    print(f"Number of speakers in test set: {num_test_speakers}")
 
     optimizer = optim.Adam(
             [{'params': model.parameters()}, {'params': fc.parameters()}], 
@@ -81,7 +85,7 @@ def main():
             best_acc = max(val_acc, best_acc)
 
             print(f'Best accuracy: {best_acc:.2f}%')
-            print("Ran epoch {} in {:.1f} seconds".format(epoch, time.time()-now))
+            print(f"Ran epoch {epoch+1} in {time.time()-now:.1f} seconds")
             
             # Save model with highest validation accuracy
             if is_best:
@@ -105,6 +109,7 @@ def train(train_loader, model, optimizer, ce_criterion, fc, epoch, device) -> No
     """Train for one epoch on the training set"""
     triplet_losses = AverageMeter()
     ce_losses = AverageMeter()
+    accuracies = AverageMeter()
 
     # switch to train mode
     model.train()
@@ -120,6 +125,7 @@ def train(train_loader, model, optimizer, ce_criterion, fc, epoch, device) -> No
         features = model(input_var, train=True)
         output = fc(features)
         ce_loss = ce_criterion(output, target_var)
+        accuracies.update(accuracy_score(target_var.detach().cpu().numpy(), torch.argmax(output, dim=1).detach().cpu().numpy()))
 
         triplet_loss = batch_hard_triplet_loss(target_var, features, margin=1, device=device)
         triplet_losses.update(triplet_loss.data.item(), x.size(0))
@@ -131,7 +137,7 @@ def train(train_loader, model, optimizer, ce_criterion, fc, epoch, device) -> No
         optimizer.step()
 
         if batch_idx % config.getint("VECTORIZER", "log_interval") == 0:
-            string = f"Epoch: {epoch+1}\tTriplet Loss: {triplet_losses.value:.3f}\tCE Loss: {ce_losses.value:.3f}"
+            string = f"Epoch: {epoch+1}\tTriplet Loss: {triplet_losses.value:.3f}\tCE Loss: {ce_losses.value:.3f}\tAccuracy: {accuracies.value*100:.2f}%"
             print(string)
 
         batch_idx += 1
@@ -167,7 +173,7 @@ def validate(model, test_loader, device) -> float:
                 X_test.extend(embs) 
                 y_test.extend([label]*len(embs))
 
-        neigh = KNeighborsClassifier(n_neighbors=3, metric='euclidean')
+        neigh = KNeighborsClassifier(n_neighbors=3, metric='cosine')
         neigh.fit(X, y)
 
         accuracy += neigh.score(X_test, y_test)
