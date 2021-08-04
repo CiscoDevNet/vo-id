@@ -58,11 +58,14 @@ def main():
     print(f"Number of speakers in test set: {num_test_speakers}")
 
     optimizer = optim.Adam(
-            [{'params': model.parameters()}, {'params': fc.parameters()}], 
+            [   
+                {'params': model.parameters()},
+                {'params': fc.parameters()}
+            ], 
             lr=config.getfloat("VECTORIZER", "lr")
         )
 
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max')
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', verbose=True, factor=0.3)
     ce_criterion = torch.nn.CrossEntropyLoss().to(device)
     start_epoch = 0
     model.to(device)
@@ -132,7 +135,6 @@ def train(train_loader, model, optimizer, ce_criterion, fc, epoch, device) -> No
         ce_losses.update(ce_loss.data.item(), x.size(0))
         loss = config.getfloat("VECTORIZER", "triplet_loss_alpha") * triplet_loss + ce_loss
 
-        # compute gradient and do SGD step
         loss.backward()
         optimizer.step()
 
