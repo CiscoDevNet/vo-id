@@ -95,7 +95,7 @@ Rich Transcription Time Marked (RTTM) files are space-delimited text files conta
 -----
 
 ## Perform Speaker Recognition
-Speaker Recognition works very similarly to Speaker Diarization, with the difference that each voice segment get assigned the name of the person the system think it's speaking. <br>
+Speaker Recognition works very similarly to Speaker Diarization, with the difference that each voice segment gets assigned the name of the person the system thinks it's speaking. <br>
 In order to do so we need to provide ``Enrollment file``, meaning audio files with examples of the voice of the speakers present in the audio we are diarizing.
 
 ```python
@@ -168,7 +168,7 @@ Work in Progress...
 
 --------
 
-## Train Vectorizer
+## Train the Vectorizer
 If it's the first time you run it, this might take a while to download all the training data.<br>
 Just hang on :) 
 ```bash
