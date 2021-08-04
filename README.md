@@ -144,7 +144,7 @@ In order to do so we need to provide ``Enrollment file``, meaning audio files wi
 
 ## Perform Speaker Verification
 We can use our voice similarly to how we use our fingerprints or faces on modern smartphones: to let only the right users have access to a system. <br>
-By providing voice examples of someone voice, we can then compare new audio samples with the ones we have previously stored.
+By providing voice examples of someone's voice, we can then compare new audio samples with the ones we have previously stored.
 
 ```python
 >>> enroll_f1_path = "tests/audio_samples/enroll_fridman_1.wav"
