@@ -2,18 +2,16 @@
 -----
 
 ## Project Description
-This package contains the tool to build software solutions for:
 * [Installation](#installation)
 * [Voice Fingerprinting](#compute-the-voice-fingerprint-from-an-audio-file)
-* [Speaker diarization](#)
-* Speaker recognition
-* Speaker Verification 
-* Voice Cloning
-* ...
+* [Speaker diarization](#perform-speaker-diarization)
+* [Speaker recognition](#perform-speaker-recognition)
+* [Speaker Verification](#perform-speaker-verification) 
+* [Voice Cloning](#voice-cloning)
 
 All these functionalities are possibple thanks to a neural model that converts audio into a **Voice Fingerprint** <br>
 Below you can find examples on how to use the package as is. <br><br>
-We are providing all the code and data for training the Neural Network, so if you have improvements to submit, fork the repo, make pull requests or open issues.
+We are providing all the code and data for training the Neural Network, so if you have improvements to submit, please fork the repo, make pull requests or open issues.
 
 ------
 
