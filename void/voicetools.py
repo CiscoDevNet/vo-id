@@ -17,12 +17,14 @@ from scipy.optimize import linear_sum_assignment
 from scipy.spatial import distance
 
 class ToolBox(object):
-    def __init__(self):
+    def __init__(self, use_cpu:bool=False):
+        self.use_cpu = use_cpu
         self._load()
 
     def _load(self):
         self.model = Model()
         self.storage = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+        self.storage = 'cpu' if self.use_cpu else self.storage
         checkpoint = torch.load(config.get('VECTORIZER', 'trained_model'), map_location=self.storage)
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.model = self.model.to(self.storage)
