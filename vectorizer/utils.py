@@ -8,7 +8,6 @@ import configparser
 config = configparser.ConfigParser(allow_no_value=True)
 config.read("config.ini")
 
-print("Loading speaker_id dict...")
 speaker_id_dict = joblib.load(config.get("VECTORIZER", "train_labels_dict"))
 def preprocess(x):
     audios = list()
