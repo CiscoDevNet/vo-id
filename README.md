@@ -3,7 +3,9 @@
 
 ## Project Description
 This package contains the tool to build software solutions for:
-* Speaker diarization
+* [Installation](#installation)
+* [Voice Fingerprinting](#compute-the-voice-fingerprint-from-an-audio-file)
+* [Speaker diarization](#)
 * Speaker recognition
 * Speaker Verification 
 * Voice Cloning
@@ -139,7 +141,7 @@ In order to do so we need to provide ``Enrollment file``, meaning audio files wi
  'SPEAKER filename 1 32.04 0.09 <NA> <NA> Fridman <NA> <NA>\n']
 ```
 
-### NB: Even though we provided `3 enrollment speakers`, becacuse the meeting only had 2, the system correctly output only `2` in total.
+#### NB: Even though we provided `3 enrollment speakers`, becacuse the meeting only had 2, the system correctly outputs only `2` in total.
 ---
 
 ## Perform Speaker Verification
@@ -161,6 +163,13 @@ By providing voice examples of someone voice, we can then compare new audio samp
 Same person probability: 82.24%
 ```
 
+--------
+
+## Voice Cloning
+Work in Progress...
+
+--------
+
 ## Train Vectorizer
 If it's the first time you run it, this might take a while to download all the training data.<br>
 Just hang on :) 
@@ -168,12 +177,6 @@ Just hang on :)
 mkdir vectorizer/data
 python vectorizer/train.py
 ```
-
---- 
-
-## Training a new Voice Embedder
-
-Work in Progress...
 
 ### Notes
 1. The tranining runs a classifier on the speakers, yet the speaker_ids are not consistent with how PyTorch handles the classification task:
