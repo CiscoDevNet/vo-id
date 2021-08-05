@@ -91,6 +91,16 @@ class ToolBox(object):
         return features.cpu().numpy()
 
 
+    def _diarize(self, audio:np.array, max_num_speakers:int) -> tuple:
+        segments = self.segmenter(audio)
+        audio_clips = [audio[s[0]:s[1]] for s in segments]
+        vectors = list(map(self.vectorize, audio_clips)) 
+        vectors = [item for sublist in vectors for item in sublist]
+        self.clusterer.max_clusters = max_num_speakers
+        labels = self.clusterer.predict(np.squeeze(np.array(vectors)))
+        return segments, labels
+
+
     def diarize(self, audio:Union[np.array, str], sr:int=16000, max_num_speakers:int=30) -> list:
         """
         Parameters
@@ -111,14 +121,8 @@ class ToolBox(object):
 
         """
         rttm = list()
-
         audio = self._check_audio(audio, sr)
-        segments = self.segmenter(audio)
-        audio_clips = [audio[s[0]:s[1]] for s in segments]
-        vectors = list(map(self.vectorize, audio_clips)) 
-        vectors = [item for sublist in vectors for item in sublist]
-        self.clusterer.max_clusters = max_num_speakers
-        labels = self.clusterer.predict(np.squeeze(np.array(vectors)))
+        segments, labels = self._diarize(audio, max_num_speakers)
         for idx, segment in enumerate(segments):
             line = f"SPEAKER filename 1 {segment[0]/sr:.2f} {(segment[1]-segment[0])/sr:.2f} <NA> <NA> speaker{labels[idx]} <NA> <NA>\n"
             rttm.append(line)
@@ -163,12 +167,8 @@ class ToolBox(object):
             enrollment_dict[label].append(np.squeeze(vector))
         enrollment_X, enrollment_y = zip(*[(np.mean(vectors, axis=0), label) for label, vectors in enrollment_dict.items()])
 
-        segments = self.segmenter(audio)
-        audio_clips = [audio[s[0]:s[1]] for s in segments]
-        vectors = list(map(self.vectorize, audio_clips)) 
-        vectors = [item for sublist in vectors for item in sublist]
-        self.clusterer.max_clusters = max_num_speakers
-        labels = self.clusterer.predict(np.squeeze(np.array(vectors)))
+        # Run diarization
+        segments, labels = self._diarize(audio, max_num_speakers)
 
         # Compute representative vector for each label
         segments_dict = defaultdict(list)
