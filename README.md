@@ -36,6 +36,8 @@ We are providing all the code and data for training the Neural Network, so if yo
 
 ## Compute the voice fingerprint from an audio file
 By default the model creates a voice fingerprint or voice vector every 100 milliseconds.
+
+**Example in Python:** :snake:
 ```python
 audio_path = "tests/audio_samples/short_podcast.wav"
 from void.voicetools import ToolBox
@@ -48,7 +50,7 @@ print(audio_vectors.shape)
 ------
 
 ## Perform Speaker Diarization
-Speaker diarization answers the question: ``"Who spoke when?"``. <br>
+**Speaker diarization** answers the question: ``"Who spoke when?"``. <br>
 If you run this tool on a meeting recording for example, each spoken segment will get an anonymous speaker ID assigned. <br>
 The format in use is [RTTM](https://github.com/nryant/dscore#rttm). <br>
 Rich Transcription Time Marked (RTTM) files are space-delimited text files containing one turn per line, each line containing ten fields:
@@ -68,6 +70,7 @@ Rich Transcription Time Marked (RTTM) files are space-delimited text files conta
   is correct; should always be ``<NA>``
 - ``Signal Lookahead Time``  --  should always be ``<NA>``
 
+**Example in Python:** :snake:
 ```python
 audio_path = "tests/audio_samples/short_podcast.wav"
 from void.voicetools import ToolBox
@@ -97,9 +100,10 @@ pprint(rttm)
 -----
 
 ## Perform Speaker Recognition
-Speaker Recognition works very similarly to Speaker Diarization, with the difference that each voice segment gets assigned the name of the person the system thinks it's speaking. <br>
+**Speaker Recognition** works very similarly to Speaker Diarization, with the difference that each voice segment gets assigned the name of the person the system thinks it's speaking. <br>
 In order to do so we need to provide ``Enrollment file``, meaning audio files with examples of the voice of the speakers present in the audio we are diarizing.
 
+**Example in Python:** :snake:
 ```python
 audio_path = "tests/audio_samples/short_podcast.wav"
 # Provide enrollment samples
@@ -143,13 +147,14 @@ pprint(rttm)
 """
 ```
 
-#### NB: Even though we provided `3 enrollment speakers`, becacuse the meeting only had 2, the system correctly outputs only `2` in total.
+#### NB: We provided `3 enrollment speakers` but the meeting only had 2. <br>  The system correctly outputs only `2` in total.
 ---
 
 ## Perform Speaker Verification
 We can use our voice similarly to how we use our fingerprints or faces on modern smartphones: to let only the right users have access to a system. <br>
 By providing voice examples of someone's voice, we can then compare new audio samples with the ones we have previously stored.
 
+**Example in Python:** :snake:
 ```python
 enroll_f1_path = "tests/audio_samples/enroll_fridman_1.wav"
 enroll_f2_path = "tests/audio_samples/enroll_fridman_2.wav"
@@ -168,7 +173,7 @@ print(f"Same person probability: {similarity*100:.2f}%")
 --------
 
 ## Voice Cloning
-Work in Progress...
+Work in Progress... :construction_worker:
 
 --------
 
