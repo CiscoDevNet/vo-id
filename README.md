@@ -179,7 +179,7 @@ Work in Progress... :construction_worker:
 
 ## Train the Vectorizer
 If it's the first time you run it, this might take a while to download all the training data.<br>
-Just hang on :) 
+Just hang on :hourglass_flowing_sand:
 ```bash
 mkdir vectorizer/data
 python vectorizer/train.py
