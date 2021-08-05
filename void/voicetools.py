@@ -184,7 +184,7 @@ class ToolBox(object):
         if len(segment_X.shape) == 1:
             segment_X = segment_X[None, :]
 
-        cost = distance.cdist(np.array(enrollment_X), np.array(segment_X), metric='euclidean')
+        cost = distance.cdist(np.array(enrollment_X), np.array(segment_X), metric='cosine')
         row_ind, col_ind = linear_sum_assignment(cost)
         num_solutions = len(row_ind)
         id2label = dict()
