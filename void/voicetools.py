@@ -2,7 +2,7 @@ import sys, os
 import librosa
 import torch
 import numpy as np
-from typing import Union
+from typing import Union, Tuple, List
 from collections import defaultdict
 
 import configparser
@@ -91,7 +91,7 @@ class ToolBox(object):
         return features.cpu().numpy()
 
 
-    def _diarize(self, audio:np.array, max_num_speakers:int) -> tuple:
+    def _diarize(self, audio:np.array, max_num_speakers:int) -> Tuple[List[Tuple[int, int]], np.array]:
         segments = self.segmenter(audio)
         audio_clips = [audio[s[0]:s[1]] for s in segments]
         vectors = list(map(self.vectorize, audio_clips)) 
@@ -101,7 +101,7 @@ class ToolBox(object):
         return segments, labels
 
 
-    def diarize(self, audio:Union[np.array, str], sr:int=16000, max_num_speakers:int=30) -> list:
+    def diarize(self, audio:Union[np.array, str], sr:int=16000, max_num_speakers:int=30) -> List[str]:
         """
         Parameters
         ----------
@@ -129,7 +129,7 @@ class ToolBox(object):
         return rttm
 
 
-    def recognize(self, audio:Union[np.array, str], enrollments:list, sr:int=16000, max_num_speakers:int=30) -> list:
+    def recognize(self, audio:Union[np.array, str], enrollments:list, sr:int=16000, max_num_speakers:int=30) -> List[str]:
         """
         Parameters
         ----------
