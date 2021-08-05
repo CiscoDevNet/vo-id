@@ -11,7 +11,7 @@
 
 All these functionalities are possibple thanks to a neural model that converts audio into a **Voice Fingerprint** <br>
 Below you can find examples on how to use the package as is. <br><br>
-We are providing all the code and data for training the Neural Network, so if you have improvements to submit, please fork the repo, make pull requests or open issues.
+We are providing all the code and data for training the Neural Network, so if you have improvements to submit, please fork the repo, make pull requests or open issues. :handshake:
 
 ------
 
@@ -35,14 +35,14 @@ We are providing all the code and data for training the Neural Network, so if yo
 ------------
 
 ## Compute the voice fingerprint from an audio file
-By default the model creates a voice fingerprint or voice vector every 100 milliseconds
+By default the model creates a voice fingerprint or voice vector every 100 milliseconds.
 ```python
->>> audio_path = "tests/audio_samples/short_podcast.wav"
->>> from void.voicetools import ToolBox
->>> tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
->>> audio_vectors = tb.vectorize(audio_path)
->>> print(audio_vectors.shape)
-(322, 128)
+audio_path = "tests/audio_samples/short_podcast.wav"
+from void.voicetools import ToolBox
+tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
+audio_vectors = tb.vectorize(audio_path)
+print(audio_vectors.shape)
+# (322, 128)
 ```
 
 ------
@@ -69,12 +69,13 @@ Rich Transcription Time Marked (RTTM) files are space-delimited text files conta
 - ``Signal Lookahead Time``  --  should always be ``<NA>``
 
 ```python
->>> audio_path = "tests/audio_samples/short_podcast.wav"
->>> from void.voicetools import ToolBox
->>> from pprint import pprint
->>> tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
->>> rttm = tb.diarize(audio_path)
->>> pprint(rttm)
+audio_path = "tests/audio_samples/short_podcast.wav"
+from void.voicetools import ToolBox
+from pprint import pprint
+tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
+rttm = tb.diarize(audio_path)
+pprint(rttm)
+""" 
 ['SPEAKER filename 1 0.39 3.96 <NA> <NA> speaker0 <NA> <NA>\n',
  'SPEAKER filename 1 4.71 2.85 <NA> <NA> speaker0 <NA> <NA>\n',
  'SPEAKER filename 1 8.19 5.97 <NA> <NA> speaker0 <NA> <NA>\n',
@@ -90,6 +91,7 @@ Rich Transcription Time Marked (RTTM) files are space-delimited text files conta
  'SPEAKER filename 1 27.99 0.15 <NA> <NA> speaker1 <NA> <NA>\n',
  'SPEAKER filename 1 28.47 3.48 <NA> <NA> speaker1 <NA> <NA>\n',
  'SPEAKER filename 1 32.04 0.09 <NA> <NA> speaker1 <NA> <NA>\n']
+"""
 ```
 
 -----
@@ -99,18 +101,18 @@ Speaker Recognition works very similarly to Speaker Diarization, with the differ
 In order to do so we need to provide ``Enrollment file``, meaning audio files with examples of the voice of the speakers present in the audio we are diarizing.
 
 ```python
->>> audio_path = "tests/audio_samples/short_podcast.wav"
->>> # Provide enrollment samples
->>> enroll_f1_path = "tests/audio_samples/enroll_fridman_1.wav"
->>> enroll_f2_path = "tests/audio_samples/enroll_fridman_2.wav"
->>> enroll_c1_path = "tests/audio_samples/enroll_chomsky_1.wav"
->>> enroll_c2_path = "tests/audio_samples/enroll_chomsky_2.wav"
->>> enroll_d1_path = "tests/audio_samples/enroll_dario_1.wav"
->>> enroll_d2_path = "tests/audio_samples/enroll_dario_2.wav"
->>> from void.voicetools import ToolBox
->>> from pprint import pprint
->>> tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
->>> rttm = tb.recognize(audio_path, 
+audio_path = "tests/audio_samples/short_podcast.wav"
+# Provide enrollment samples
+enroll_f1_path = "tests/audio_samples/enroll_fridman_1.wav"
+enroll_f2_path = "tests/audio_samples/enroll_fridman_2.wav"
+enroll_c1_path = "tests/audio_samples/enroll_chomsky_1.wav"
+enroll_c2_path = "tests/audio_samples/enroll_chomsky_2.wav"
+enroll_d1_path = "tests/audio_samples/enroll_dario_1.wav"
+enroll_d2_path = "tests/audio_samples/enroll_dario_2.wav"
+from void.voicetools import ToolBox
+from pprint import pprint
+tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
+rttm = tb.recognize(audio_path, 
                             enrollments=[
                                 (enroll_c1_path, "Chomsky"), 
                                 (enroll_f1_path, "Fridman"), 
@@ -121,7 +123,8 @@ In order to do so we need to provide ``Enrollment file``, meaning audio files wi
                             ],
                             max_num_speakers=10
                         )
->>> pprint(rttm)
+pprint(rttm)
+"""
 ['SPEAKER filename 1 0.39 3.96 <NA> <NA> Chomsky <NA> <NA>\n',
  'SPEAKER filename 1 4.71 2.85 <NA> <NA> Chomsky <NA> <NA>\n',
  'SPEAKER filename 1 8.19 5.97 <NA> <NA> Chomsky <NA> <NA>\n',
@@ -137,6 +140,7 @@ In order to do so we need to provide ``Enrollment file``, meaning audio files wi
  'SPEAKER filename 1 27.99 0.15 <NA> <NA> Fridman <NA> <NA>\n',
  'SPEAKER filename 1 28.47 3.48 <NA> <NA> Fridman <NA> <NA>\n',
  'SPEAKER filename 1 32.04 0.09 <NA> <NA> Fridman <NA> <NA>\n']
+"""
 ```
 
 #### NB: Even though we provided `3 enrollment speakers`, becacuse the meeting only had 2, the system correctly outputs only `2` in total.
@@ -147,18 +151,18 @@ We can use our voice similarly to how we use our fingerprints or faces on modern
 By providing voice examples of someone's voice, we can then compare new audio samples with the ones we have previously stored.
 
 ```python
->>> enroll_f1_path = "tests/audio_samples/enroll_fridman_1.wav"
->>> enroll_f2_path = "tests/audio_samples/enroll_fridman_2.wav"
->>> new_audio = "tests/audio_samples/verify_fridman.wav"
->>> from void.voicetools import ToolBox
->>> tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
->>> similarity = tb.verify(new_audio, 
+enroll_f1_path = "tests/audio_samples/enroll_fridman_1.wav"
+enroll_f2_path = "tests/audio_samples/enroll_fridman_2.wav"
+new_audio = "tests/audio_samples/verify_fridman.wav"
+from void.voicetools import ToolBox
+tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
+similarity = tb.verify(new_audio, 
                                 enrollments=[
                                     (enroll_f1_path, "Fridman"),
                                     (enroll_f2_path, "Fridman"),
                                 ])
->>> print(f"Same person probability: {similarity*100:.2f}%")
-"Same person probability: 82.24%"
+print(f"Same person probability: {similarity*100:.2f}%")
+#Same person probability: 82.24%
 ```
 
 --------
