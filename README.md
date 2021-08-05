@@ -158,7 +158,7 @@ By providing voice examples of someone's voice, we can then compare new audio sa
                                     (enroll_f2_path, "Fridman"),
                                 ])
 >>> print(f"Same person probability: {similarity*100:.2f}%")
-Same person probability: 82.24%
+"Same person probability: 82.24%"
 ```
 
 --------
