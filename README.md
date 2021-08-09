@@ -192,3 +192,15 @@ python vectorizer/train.py
     ```
 2. For this reason the file `vectorizer/speaker_ids_map.bin` stores a mapping that allows to provide labels from `0` to `num_speakers-1`
 -----
+
+## Citation
+
+```
+@software{Uno,
+  author = {Dario Cazzani},
+  title = {vo-id: VOice IDentification tools},
+  url = {https://github.com/CiscoDevNet/vo-id},
+  version = {0.1},
+  year = {2021},
+} 
+```
