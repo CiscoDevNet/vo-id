@@ -6,7 +6,7 @@ When speakers in the same meeting are speaking from the same room/device, they a
 Because Webex Meetings recordings are provided with transcriptions, being able to answer "Who spoke when?" would allow colleagues who might have missed meeting to quickly catch up with what was said, together with being able to provide automatic highlights and summaries.
 This is very useful, but without knowing who said what, it is more difficult for humans to skim through the content, and for AI solutions to provide more accurate results.
 
-![image of diarized meeting](lksj)
+![image of diarized meeting](https://github.com/CiscoDevNet/vo-id/blob/blogs/blogs/Webex-Blog/images/diarized_meeting.png)
 
 ## Overview of our solution
 
@@ -34,7 +34,6 @@ What you can build with a good Neural Voice Embedder doesn't stop with Speaker D
 If you have some labelled audio samples from speakers that are present in the meetings you want to diarize, you could go one step further and provide the correct name for each segment.<br>
 Similary you could build a voice authentication/verification app by comparing an audio input with a database of labelled audio segments. <br><br>
 * Project vo-id: we wanted to make it easy for developers to get their hands dirty and quickly build solutions around the speaker diarization and recognition domain. Project vo-id (Voice Identification) is structured to let developers with different expertise in AI to do so.
-<br>
 The [README](https://github.com/CiscoDevNet/vo-id#readme) cointains all the information needed, just to give you an example, it takes only 4 lines of code to perform speaker diarization on an audio file:
     ```python
     audio_path = "tests/audio_samples/short_podcast.wav"
