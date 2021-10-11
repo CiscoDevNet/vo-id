@@ -16,7 +16,7 @@ This is very useful, but without knowing who said what, it is more difficult for
 4. Integration with Webex: Webex meetings are transcribed using Voicea's ASR solution. In this section we will talk about the work we've done in order to deploy the Speaker Diarization to production as an extra module to the ASR pipeline
 
 ## Speaker Diarization in 3 steps
-![Image of speaker diarization pipeline]()
+![Image of speaker diarization pipeline](https://github.com/CiscoDevNet/vo-id/blob/blogs/blogs/Webex-Blog/images/speaker-diar-pipeline.png)
 The process to assign speaker labels to an audio file is straightfoward and can be divided into 3 steps:
 1. Split Audio: The first thing we want to do is to split the audio input into smaller audio chunks of the same length, and discard all those segments that do not contain voice. We are therefore discarding silence and background noise. We use an off the shelf solution: [WebRTC Voice Activity Detector](https://github.com/wiseman/py-webrtcvad)
 2. Compute Voice Fingerprints: The next step involves transforming each audio chunk to "Voice Fingerprints". These fingerprints are 256 dimensional vectors each, in other words a list of 256 of numbers. The objective is to make sure that vectors produced from different audio chunks belonging to the same speaker will be similar to each other according to some mathematical measurement. 
@@ -57,7 +57,7 @@ On the downside, we can't go back in time and correct possible mistakes.
 If the generated voice fingerprints are of high quality, the results are usually good.
 We adopted a straighforward greedy algorithm: as a new vector get processed, we can assign it to a new or an existing bucket (collection of vectors).
 This is done by measuring how similar the new vector is to the average vector in each bucket; if similar enough (based on a particular similarity threshold), the vector will be added to the most similar bucket, otherwise it will be assigned a new one. <br>
-![online clustering]()
+![online clustering](https://github.com/CiscoDevNet/vo-id/blob/blogs/blogs/Webex-Blog/images/online-diarize.png)
 
 ### Offline:
 Offline clustering means that we assign a speaker label to each vector only after we have access to the entire audio.
@@ -73,19 +73,21 @@ blah
 ## Integration with Webex
 blah
 ## Project vo-id
-* We can do more:
+### We can do more:
 What you can build with a good Neural Voice Embedder doesn't stop with Speaker Diarization. <br>
 If you have some labelled audio samples from speakers that are present in the meetings you want to diarize, you could go one step further and provide the correct name for each segment.<br>
 Similarly, you could build a voice authentication/verification app by comparing an audio input with a database of labelled audio segments. <br><br>
-* Project vo-id: we wanted to make it easy for developers to get their hands dirty and quickly build solutions around the speaker diarization and recognition domain. Project vo-id (Voice Identification) is structured to let developers with different expertise in AI to do so.
+### Project vo-id
+We wanted to make it easy for developers to get their hands dirty and quickly build solutions around the speaker diarization and recognition domain. Project vo-id (Voice Identification) is an open-source project structured to let developers with different expertise in AI to do so.
 The [README](https://github.com/CiscoDevNet/vo-id#readme) cointains all the information needed, just to give you an example, it takes only 4 lines of code to perform speaker diarization on an audio file:
-    ```python
-    audio_path = "tests/audio_samples/short_podcast.wav"
-    from void.voicetools import ToolBox
-    tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
-    audio_vectors = tb.vectorize(audio_path)
-    ```
+```python
+audio_path = "tests/audio_samples/short_podcast.wav"
+from void.voicetools import ToolBox
+tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
+audio_vectors = tb.vectorize(audio_path)
+```
 
-* Training your own Voice Embedder: we provided a trained neural network (the vectorizer), but if you have the resources, we made it possible to update and train the neural network yourself: all the information needed is available in the [README](https://github.com/CiscoDevNet/vo-id#train-the-vectorizer)
+### Training your own Voice Embedder
+We provided a trained neural network (the vectorizer), but if you have the resources, we made it possible to update and train the neural network yourself: all the information needed is available in the [README](https://github.com/CiscoDevNet/vo-id#train-the-vectorizer)
 
 
