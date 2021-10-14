@@ -139,11 +139,10 @@ If you have some labelled audio samples from speakers that are present in the me
 Similarly, you could build a voice authentication/verification app by comparing an audio input with a database of labelled audio segments. <br><br>
 ### Project vo-id
 We wanted to make it easy for developers to get their hands dirty and quickly build solutions around the speaker diarization and recognition domain. Project vo-id (Voice Identification) is an open-source project structured to let developers with different expertise in AI to do so.
-The [README](https://github.com/CiscoDevNet/vo-id#readme) cointains all the information needed, just to give you an example, it takes only 5 lines of code to perform speaker diarization on an audio file:
+The [README](https://github.com/CiscoDevNet/vo-id#readme) cointains all the information needed, just to give you an example, it takes only 4 lines of code to perform speaker diarization on an audio file:
 ```python
 audio_path = "tests/audio_samples/short_podcast.wav"
 from void.voicetools import ToolBox
-from pprint import pprint
 tb = ToolBox(use_cpu=True) # Leave `use_cpu` blank to let the machine use the GPU if available  
 rttm = tb.diarize(audio_path)
 ```
