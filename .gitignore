@@ -131,3 +131,5 @@ dmypy.json
 #
 ._*
 vectorizer/data/*
+
+.DS_Store
