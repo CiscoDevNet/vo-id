@@ -1,4 +1,4 @@
-![main image](https://github.com/CiscoDevNet/vo-id/blob/blogs/blogs/Webex-Blog/images/main.png)
+![main image](https://github.com/CiscoDevNet/vo-id/blob/master/blogs/Webex-Blog/images/main.png)
 ## Who said that? A quick technical intro to Speaker Diarization
 Speaker Diarization answers the question: "Who spoke when?".
 Currently, speakers in a meeting are identified through channel endpoints whether through PSTN or VOIP.
